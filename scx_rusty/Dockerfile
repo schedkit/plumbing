@@ -1,6 +1,8 @@
 # Build stage using Debian-based Rust image
 FROM rust:1.84-slim AS builder
 
+ADD https://github.com/sched-ext/scx.git /scx
+
 # Install necessary build dependencies, including the missing tools for LLVM installation
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
@@ -27,7 +29,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 100 \
     && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-16 100
 
-WORKDIR /scx_rusty
+WORKDIR /scx/scheds/rust/scx_rusty
 COPY . .
 
 # Build the project using the default glibc target
@@ -35,7 +37,7 @@ RUN cargo build -p scx_rusty --release
 
 # Final distroless image
 FROM gcr.io/distroless/cc
-COPY --from=builder /scx_rusty/target/release/scx_rusty /scx_rusty
+COPY --from=builder /scx/target/release/scx_rusty /scx_rusty
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libelf.so.1 /usr/lib/libelf.so.1
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libz.so.1 /usr/lib/libz.so.1
 
