@@ -69,5 +69,7 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          provenance: mode=max
+          sbom: true
           tags: ghcr.io/schedkit/${{ matrix.node_name }}:latest
 
