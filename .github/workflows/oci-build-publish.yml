@@ -68,5 +68,5 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          tags: ghcr.io/scheds/${{ github.repository }}-${{ matrix.node_name }}:latest
+          tags: ghcr.io/scheds/${{ matrix.node_name }}:latest
 
