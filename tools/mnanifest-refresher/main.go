@@ -7,6 +7,12 @@ import (
 	"strings"
 )
 
+type SchedkitImage struct {
+	ImageURI string `json:"imageURI"`
+}
+
+type ManifestMap = map[string]SchedkitImage
+
 func main() {
 	entries, err := os.ReadDir(".")
 	if err != nil {
@@ -14,7 +20,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	m := make(map[string]string)
+	m := make(ManifestMap)
 	for _, e := range entries {
 		if !e.IsDir() {
 			continue
@@ -27,7 +33,7 @@ func main() {
 		if HasDockerfile(subEntries) {
 			schedulerName := e.Name()
 			schedulerImage := fmt.Sprintf("ghcr.io/schedkit/%s", e.Name())
-			m[schedulerName] = schedulerImage
+			m[schedulerName] = SchedkitImage{ImageURI: schedulerImage}
 		}
 	}
 
