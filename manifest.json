@@ -1,0 +1,14 @@
+{
+  "scx_bpfland": {
+    "imageURI": "ghcr.io/schedkit/scx_bpfland"
+  },
+  "scx_rustland": {
+    "imageURI": "ghcr.io/schedkit/scx_rustland"
+  },
+  "scx_rusty": {
+    "imageURI": "ghcr.io/schedkit/scx_rusty"
+  },
+  "scx_test": {
+    "imageURI": "ghcr.io/schedkit/scx_test"
+  }
+}
