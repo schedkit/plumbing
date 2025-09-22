@@ -30,4 +30,5 @@ jobs:
         with:
           commit-message: "chore: refresh manifest.json"
           committer: "Alessio Biancalana <alessio@dottorblaster.it>"
+          title: Automated manifest update
 
