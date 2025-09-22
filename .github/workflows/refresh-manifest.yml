@@ -1,0 +1,30 @@
+name: Refresh manifest
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+
+env:
+  # Use docker.io for Docker Hub if empty
+  REGISTRY: ghcr.io
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v6
+
+      - run: go run tools/manifest-refresher/main.go
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+
