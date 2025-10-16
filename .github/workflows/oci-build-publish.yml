@@ -9,7 +9,7 @@ on:
   schedule:
     - cron: '25 11 * * *'
   push:
-    branches: [ "main" ]
+    branches: [ "**" ]
     # Publish semver tags as releases.
 
   pull_request:
@@ -21,10 +21,12 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Use native runners for each platform to avoid QEMU emulation issues with BPF
+    runs-on: ${{ matrix.platform == 'linux/arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     strategy:
       matrix:
         node_name: [scx_test, scx_rusty, scx_rustland, scx_bpfland, gthulhu]
+        platform: [linux/amd64, linux/arm64]
     permissions:
       contents: read
       packages: write
@@ -36,14 +38,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Install the cosign tool except on PR
-      # https://github.com/sigstore/cosign-installer
-      - name: Install cosign
-        if: github.event_name != 'pull_request'
-        uses: sigstore/cosign-installer@6e04d228eb30da1757ee4e1dd75a0ec73a653e06 #v3.1.1
-        with:
-          cosign-release: 'v2.1.1'
-
       # Workaround: https://github.com/docker/build-push-action/issues/461
       - name: Setup Docker buildx
         uses: docker/setup-buildx-action@v3
@@ -51,7 +45,7 @@ jobs:
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
       - name: Log into registry ${{ env.REGISTRY }}
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -59,17 +53,86 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           logout: false
 
-      # Build and push Docker image with Buildx (don't push on PR)
-      # https://github.com/docker/build-push-action
-      - name: Build and push Docker image for ${{ matrix.node_name }}
-        id: build-and-push-docker-image
+      # Build and push by digest for later manifest creation
+      - name: Build and push by digest for ${{ matrix.node_name }} (${{ matrix.platform }})
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: ${{ matrix.node_name }}
-          push: ${{ github.event_name != 'pull_request' }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          platforms: ${{ matrix.platform }}
+          outputs: type=image,name=${{ env.REGISTRY }}/schedkit/${{ matrix.node_name }},push-by-digest=true,name-canonical=true,push=${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+          cache-from: type=gha,scope=${{ matrix.node_name }}-${{ matrix.platform }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.node_name }}-${{ matrix.platform }}
           provenance: mode=max
           sbom: true
-          tags: ghcr.io/schedkit/${{ matrix.node_name }}:latest
+
+      # Export digest for manifest creation
+      - name: Export digest
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p /tmp/digests/${{ matrix.node_name }}
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${{ matrix.node_name }}/${digest#sha256:}"
+
+      # Upload digest as artifact
+      - name: Upload digest
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ matrix.node_name }}-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}
+          path: /tmp/digests/${{ matrix.node_name }}/*
+          if-no-files-found: error
+          retention-days: 1
+
+  # Merge all platform-specific images into a single multi-arch manifest
+  merge:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: [build]
+    strategy:
+      matrix:
+        node_name: [scx_test, scx_rusty, scx_rustland, scx_bpfland, gthulhu]
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      # Download all digests for this scheduler
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/digests/${{ matrix.node_name }}
+          pattern: digests-${{ matrix.node_name }}-*
+          merge-multiple: true
+
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log into registry ${{ env.REGISTRY }}
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Install the cosign tool
+      # https://github.com/sigstore/cosign-installer
+      - name: Install cosign
+        uses: sigstore/cosign-installer@6e04d228eb30da1757ee4e1dd75a0ec73a653e06 #v3.1.1
+        with:
+          cosign-release: 'v2.1.1'
+
+      # Create multi-arch manifest and push
+      - name: Create manifest list and push
+        working-directory: /tmp/digests/${{ matrix.node_name }}
+        run: |
+          docker buildx imagetools create \
+            --tag ${{ env.REGISTRY }}/schedkit/${{ matrix.node_name }}:latest \
+            $(printf '${{ env.REGISTRY }}/schedkit/${{ matrix.node_name }}@sha256:%s ' *)
+
+      # Verify the manifest
+      - name: Inspect image
+        run: |
+          docker buildx imagetools inspect ${{ env.REGISTRY }}/schedkit/${{ matrix.node_name }}:latest
 
