@@ -19,11 +19,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     lsb-release \
     wget \
     software-properties-common \
-    && curl -fsSL https://apt.llvm.org/llvm.sh | bash -s -- 18 \
+    && curl -fsSL https://apt.llvm.org/llvm.sh | bash -s -- 20 \
     && rm -rf /var/lib/apt/lists/*
 
-RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 100 \
-    && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-18 100
+RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-20 100 \
+    && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-20 100
 
 WORKDIR /scx/scheds/rust/scx_rustland
 COPY . .
