@@ -20,14 +20,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     software-properties-common \
     && curl -fsSL https://apt.llvm.org/llvm.sh | bash - \
     && apt-get install -y --no-install-recommends \
-    clang-16 \
-    llvm-16 \
-    llvm-16-dev \
+    clang-20 \
+    llvm-20 \
+    llvm-20-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Set Clang version 16 as default
-RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 100 \
-    && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-16 100
+RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-20 100 \
+    && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-20 100
 
 WORKDIR /scx/scheds/rust/scx_rusty
 COPY . .
