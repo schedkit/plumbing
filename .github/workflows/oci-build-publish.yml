@@ -67,6 +67,7 @@ jobs:
         with:
           context: ${{ matrix.node_name }}
           push: ${{ github.event_name != 'pull_request' }}
+          platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
           provenance: mode=max
