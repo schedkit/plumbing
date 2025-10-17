@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node_name: [scx_test, scx_rusty, scx_rustland, scx_bpfland]
+        node_name: [scx_test, scx_rusty, scx_rustland, scx_bpfland, gthulhu]
     permissions:
       contents: read
       packages: write
