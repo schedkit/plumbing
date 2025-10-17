@@ -1,4 +1,7 @@
 {
+  "gthulhu": {
+    "imageURI": "ghcr.io/schedkit/gthulhu"
+  },
   "scx_bpfland": {
     "imageURI": "ghcr.io/schedkit/scx_bpfland"
   },
