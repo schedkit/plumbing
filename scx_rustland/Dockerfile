@@ -1,9 +1,8 @@
-# Build stage using Debian-based Rust image
+ARG BUILDARCH
 FROM rust:1.87-slim AS builder
 
 ADD https://github.com/sched-ext/scx.git /scx
 
-# Install necessary build dependencies, including the missing tools for LLVM installation
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libseccomp-dev \
@@ -25,21 +24,29 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-20 100 \
     && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-20 100
 
-WORKDIR /scx/scheds/rust/scx_rustland
+WORKDIR /scx
 COPY . .
 
-# No idea why building scx_rustland requires rustfmt
 RUN rustup component add rustfmt
 
-# Build the project using the default glibc target
-RUN cargo build -p scx_rustland --release
+RUN cargo build --release -p scx_rustland
 
-# Final distroless image
-FROM gcr.io/distroless/cc
-COPY --from=builder /scx/target/release/scx_rustland /scx_rustland
+FROM alpine AS libs-amd64
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libelf.so.1 /usr/lib/libelf.so.1
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libz.so.1 /usr/lib/libz.so.1
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libseccomp.so.2 /usr/lib/libseccomp.so.2
 
+FROM alpine AS libs-arm64
+COPY --from=builder /usr/lib/aarch64-linux-gnu/libelf.so.1 /usr/lib/libelf.so.1
+COPY --from=builder /usr/lib/aarch64-linux-gnu/libz.so.1 /usr/lib/libz.so.1
+COPY --from=builder /usr/lib/aarch64-linux-gnu/libseccomp.so.2 /usr/lib/libseccomp.so.2
+
+FROM libs-${BUILDARCH} AS libs
+
+FROM gcr.io/distroless/cc
+COPY --from=builder /scx/target/release/scx_rustland /scx_rustland
+COPY --from=libs /usr/lib/libelf.so.1 /usr/lib/libelf.so.1
+COPY --from=libs /usr/lib/libz.so.1 /usr/lib/libz.so.1
+COPY --from=libs /usr/lib/libseccomp.so.2 /usr/lib/libseccomp.so.2
 
 CMD ["/scx_rustland"]
