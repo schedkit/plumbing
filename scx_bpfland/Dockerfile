@@ -1,3 +1,4 @@
+ARG BUILDARCH
 # Build stage using Debian-based Rust image
 FROM rust:1.87-slim AS builder
 
@@ -34,13 +35,24 @@ RUN rustup component add rustfmt
 # Build the project using the default glibc target
 RUN cargo build -p scx_bpfland --release
 
-# Final distroless image
-FROM gcr.io/distroless/cc
-COPY --from=builder /scx/target/release/scx_bpfland /scx_bpfland
+# Architecture-specific library stages
+FROM alpine AS libs-amd64
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libelf.so.1 /usr/lib/libelf.so.1
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libz.so.1 /usr/lib/libz.so.1
 #COPY --from=builder /usr/lib/x86_64-linux-gnu/libseccomp.so.2 /usr/lib/libseccomp.so.2
 
+FROM alpine AS libs-arm64
+COPY --from=builder /usr/lib/aarch64-linux-gnu/libelf.so.1 /usr/lib/libelf.so.1
+COPY --from=builder /usr/lib/aarch64-linux-gnu/libz.so.1 /usr/lib/libz.so.1
+#COPY --from=builder /usr/lib/aarch64-linux-gnu/libseccomp.so.2 /usr/lib/libseccomp.so.2
+
+FROM libs-${BUILDARCH} AS libs
+
+# Final distroless image
+FROM gcr.io/distroless/cc
+COPY --from=builder /scx/target/release/scx_bpfland /scx_bpfland
+COPY --from=libs /usr/lib/libelf.so.1 /usr/lib/libelf.so.1
+COPY --from=libs /usr/lib/libz.so.1 /usr/lib/libz.so.1
 
 CMD ["/scx_bpfland"]
 

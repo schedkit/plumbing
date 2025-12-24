@@ -1,3 +1,4 @@
+ARG BUILDARCH
 # Build stage using Debian-based Rust image
 FROM rust:1.84-slim AS builder
 
@@ -35,11 +36,21 @@ COPY . .
 # Build the project using the default glibc target
 RUN cargo build -p scx_rusty --release
 
-# Final distroless image
-FROM gcr.io/distroless/cc
-COPY --from=builder /scx/target/release/scx_rusty /scx_rusty
+# Architecture-specific library stages
+FROM alpine AS libs-amd64
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libelf.so.1 /usr/lib/libelf.so.1
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libz.so.1 /usr/lib/libz.so.1
 
+FROM alpine AS libs-arm64
+COPY --from=builder /usr/lib/aarch64-linux-gnu/libelf.so.1 /usr/lib/libelf.so.1
+COPY --from=builder /usr/lib/aarch64-linux-gnu/libz.so.1 /usr/lib/libz.so.1
+
+FROM libs-${BUILDARCH} AS libs
+
+# Final distroless image
+FROM gcr.io/distroless/cc
+COPY --from=builder /scx/target/release/scx_rusty /scx_rusty
+COPY --from=libs /usr/lib/libelf.so.1 /usr/lib/libelf.so.1
+COPY --from=libs /usr/lib/libz.so.1 /usr/lib/libz.so.1
 
 CMD ["/scx_rusty"]
