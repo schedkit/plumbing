@@ -53,4 +53,4 @@ COPY --from=builder /scx/target/release/scx_rusty /scx_rusty
 COPY --from=libs /usr/lib/libelf.so.1 /usr/lib/libelf.so.1
 COPY --from=libs /usr/lib/libz.so.1 /usr/lib/libz.so.1
 
-CMD ["/scx_rusty"]
+ENTRYPOINT ["/scx_rusty"]

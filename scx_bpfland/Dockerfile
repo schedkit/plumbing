@@ -54,5 +54,5 @@ COPY --from=builder /scx/target/release/scx_bpfland /scx_bpfland
 COPY --from=libs /usr/lib/libelf.so.1 /usr/lib/libelf.so.1
 COPY --from=libs /usr/lib/libz.so.1 /usr/lib/libz.so.1
 
-CMD ["/scx_bpfland"]
+ENTRYPOINT ["/scx_bpfland"]
 
