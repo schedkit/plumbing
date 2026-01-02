@@ -49,4 +49,4 @@ COPY --from=libs /usr/lib/libelf.so.1 /usr/lib/libelf.so.1
 COPY --from=libs /usr/lib/libz.so.1 /usr/lib/libz.so.1
 COPY --from=libs /usr/lib/libseccomp.so.2 /usr/lib/libseccomp.so.2
 
-CMD ["/scx_rustland"]
+ENTRYPOINT ["/scx_rustland"]
