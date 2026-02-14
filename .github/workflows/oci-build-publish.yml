@@ -24,6 +24,7 @@ jobs:
     # Use native runners for each platform to avoid QEMU emulation issues with BPF
     runs-on: ${{ matrix.platform == 'linux/arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     strategy:
+      fail-fast: false
       matrix:
         node_name: [scx_test, scx_rusty, scx_rustland, scx_bpfland, gthulhu]
         platform: [linux/amd64, linux/arm64]
@@ -90,6 +91,7 @@ jobs:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: [build]
     strategy:
+      fail-fast: false
       matrix:
         node_name: [scx_test, scx_rusty, scx_rustland, scx_bpfland, gthulhu]
     permissions:
