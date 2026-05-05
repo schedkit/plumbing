@@ -1,8 +1,9 @@
 ARG BUILDARCH
+ARG SCX_VERSION
 # Build stage using Debian-based Rust image
 FROM rust:1.87-slim AS builder
 
-ADD https://github.com/sched-ext/scx.git /scx
+ADD https://github.com/sched-ext/scx.git#${SCX_VERSION} /scx
 
 # Install necessary build dependencies, including the missing tools for LLVM installation
 RUN apt-get update && apt-get install -y --no-install-recommends \
