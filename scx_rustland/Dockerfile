@@ -1,7 +1,8 @@
 ARG BUILDARCH
+ARG SCX_VERSION
 FROM rust:1.87-slim AS builder
 
-ADD https://github.com/sched-ext/scx.git /scx
+ADD https://github.com/sched-ext/scx.git#${SCX_VERSION} /scx
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
