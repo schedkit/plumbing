@@ -140,15 +140,26 @@ jobs:
 
       # Create multi-arch manifest and push
       - name: Create manifest list and push
+        id: manifest
         working-directory: /tmp/digests/${{ matrix.node_name }}
         run: |
           docker buildx imagetools create \
             --tag ${{ env.REGISTRY }}/schedkit/${{ matrix.node_name }}:latest \
             --tag ${{ env.REGISTRY }}/schedkit/${{ matrix.node_name }}:${{ steps.version.outputs.VERSION }} \
             $(printf '${{ env.REGISTRY }}/schedkit/${{ matrix.node_name }}@sha256:%s ' *)
+          DIGEST=$(docker buildx imagetools inspect \
+            ${{ env.REGISTRY }}/schedkit/${{ matrix.node_name }}:${{ steps.version.outputs.VERSION }} \
+            --format '{{ .Manifest.Digest }}')
+          echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
 
       # Verify the manifest
       - name: Inspect image
         run: |
           docker buildx imagetools inspect ${{ env.REGISTRY }}/schedkit/${{ matrix.node_name }}:latest
+
+      # Keyless sign the manifest by digest using GitHub OIDC + Sigstore Fulcio
+      - name: Sign manifest with cosign
+        run: |
+          cosign sign --yes \
+            ${{ env.REGISTRY }}/schedkit/${{ matrix.node_name }}@${{ steps.manifest.outputs.digest }}
 
