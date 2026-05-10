@@ -50,8 +50,16 @@ FROM libs-${BUILDARCH} AS libs
 
 # Final distroless image
 FROM gcr.io/distroless/cc
+ARG SCX_VERSION
 COPY --from=builder /scx/target/release/scx_rusty /scx_rusty
 COPY --from=libs /usr/lib/libelf.so.1 /usr/lib/libelf.so.1
 COPY --from=libs /usr/lib/libz.so.1 /usr/lib/libz.so.1
+
+LABEL org.opencontainers.image.title="scx_rusty"
+LABEL org.opencontainers.image.description="Multi-domain Rust + BPF hybrid sched_ext scheduler with load balancing across LLCs."
+LABEL org.opencontainers.image.documentation="https://github.com/sched-ext/scx/tree/main/scheds/rust/scx_rusty"
+LABEL org.opencontainers.image.source="https://github.com/schedkit/plumbing/tree/main/scx_rusty"
+LABEL org.opencontainers.image.version="${SCX_VERSION}"
+LABEL org.schedkit.scheduler.kernel.min-version="6.12"
 
 ENTRYPOINT ["/scx_rusty"]
