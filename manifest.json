@@ -2,8 +2,32 @@
   "gthulhu": {
     "imageURI": "ghcr.io/schedkit/gthulhu"
   },
+  "scx_beerland": {
+    "imageURI": "ghcr.io/schedkit/scx_beerland"
+  },
   "scx_bpfland": {
     "imageURI": "ghcr.io/schedkit/scx_bpfland"
+  },
+  "scx_cosmos": {
+    "imageURI": "ghcr.io/schedkit/scx_cosmos"
+  },
+  "scx_flash": {
+    "imageURI": "ghcr.io/schedkit/scx_flash"
+  },
+  "scx_flow": {
+    "imageURI": "ghcr.io/schedkit/scx_flow"
+  },
+  "scx_lavd": {
+    "imageURI": "ghcr.io/schedkit/scx_lavd"
+  },
+  "scx_mitosis": {
+    "imageURI": "ghcr.io/schedkit/scx_mitosis"
+  },
+  "scx_p2dq": {
+    "imageURI": "ghcr.io/schedkit/scx_p2dq"
+  },
+  "scx_pandemonium": {
+    "imageURI": "ghcr.io/schedkit/scx_pandemonium"
   },
   "scx_rustland": {
     "imageURI": "ghcr.io/schedkit/scx_rustland"
@@ -13,5 +37,8 @@
   },
   "scx_test": {
     "imageURI": "ghcr.io/schedkit/scx_test"
+  },
+  "scx_tickless": {
+    "imageURI": "ghcr.io/schedkit/scx_tickless"
   }
 }
