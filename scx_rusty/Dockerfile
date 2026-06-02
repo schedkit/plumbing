@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     lsb-release \
     wget \
     software-properties-common \
-    && curl -fsSL https://apt.llvm.org/llvm.sh | bash - \
+    && curl -fsSL https://apt.llvm.org/llvm.sh | bash -s -- 20 \
     && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
