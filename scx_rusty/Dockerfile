@@ -1,7 +1,6 @@
 ARG BUILDARCH
 ARG SCX_VERSION
-# Build stage using Debian-based Rust image
-FROM rust:1.84-slim AS builder
+FROM rust:1.87-slim AS builder
 
 ADD https://github.com/sched-ext/scx.git#${SCX_VERSION} /scx
 
@@ -22,12 +21,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     software-properties-common \
     && curl -fsSL https://apt.llvm.org/llvm.sh | bash - \
     && apt-get install -y --no-install-recommends \
-    clang-20 \
-    llvm-20 \
-    llvm-20-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Set Clang version 16 as default
 RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-20 100 \
     && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-20 100
 
