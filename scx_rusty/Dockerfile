@@ -1,6 +1,6 @@
 ARG BUILDARCH
-ARG SCX_VERSION
 FROM rust:1.87-slim AS builder
+ARG SCX_VERSION
 
 ADD https://github.com/sched-ext/scx.git#${SCX_VERSION} /scx
 
