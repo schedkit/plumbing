@@ -48,7 +48,7 @@ COPY --from=libs /usr/lib/libelf.so.1 /usr/lib/libelf.so.1
 COPY --from=libs /usr/lib/libz.so.1 /usr/lib/libz.so.1
 
 LABEL org.opencontainers.image.title="scx_flow"
-LABEL org.opencontainers.image.description="Budget-based sched_ext scheduler with bounded service lanes balancing interactivity and throughput."
+LABEL org.opencontainers.image.description="Budget-driven sched_ext scheduler with per-CPU fair-share queues for deterministic scheduling and interactive workloads."
 LABEL org.opencontainers.image.documentation="https://github.com/sched-ext/scx/tree/main/scheds/experimental/scx_flow"
 LABEL org.opencontainers.image.source="https://github.com/schedkit/plumbing/tree/main/scx_flow"
 LABEL org.opencontainers.image.version="${SCX_VERSION}"

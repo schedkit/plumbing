@@ -48,7 +48,7 @@ COPY --from=libs /usr/lib/libelf.so.1 /usr/lib/libelf.so.1
 COPY --from=libs /usr/lib/libz.so.1 /usr/lib/libz.so.1
 
 LABEL org.opencontainers.image.title="scx_mitosis"
-LABEL org.opencontainers.image.description="Dynamic affinity sched_ext scheduler with cgroup-driven cell management."
+LABEL org.opencontainers.image.description="Cgroup-aware sched_ext scheduler that isolates datacenter workloads into cells with dedicated CPU sets."
 LABEL org.opencontainers.image.documentation="https://github.com/sched-ext/scx/tree/main/scheds/rust/scx_mitosis"
 LABEL org.opencontainers.image.source="https://github.com/schedkit/plumbing/tree/main/scx_mitosis"
 LABEL org.opencontainers.image.version="${SCX_VERSION}"
