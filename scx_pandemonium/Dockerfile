@@ -48,7 +48,7 @@ COPY --from=libs /usr/lib/libelf.so.1 /usr/lib/libelf.so.1
 COPY --from=libs /usr/lib/libz.so.1 /usr/lib/libz.so.1
 
 LABEL org.opencontainers.image.title="scx_pandemonium"
-LABEL org.opencontainers.image.description="Behavioral adaptive sched_ext scheduler with three-tier classification and process learning."
+LABEL org.opencontainers.image.description="Adaptive sched_ext scheduler with latency tiers, stall detection, and topology-aware placement for mixed interactive and batch workloads."
 LABEL org.opencontainers.image.documentation="https://github.com/sched-ext/scx/tree/main/scheds/rust/scx_pandemonium"
 LABEL org.opencontainers.image.source="https://github.com/schedkit/plumbing/tree/main/scx_pandemonium"
 LABEL org.opencontainers.image.version="${SCX_VERSION}"

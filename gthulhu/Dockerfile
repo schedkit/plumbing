@@ -4,7 +4,7 @@ ARG SCX_VERSION
 COPY --from=builder /gthulhu/main /main
 
 LABEL org.opencontainers.image.title="gthulhu"
-LABEL org.opencontainers.image.description="gthulhu sched_ext scheduler."
+LABEL org.opencontainers.image.description="Workload-aware sched_ext scheduler for cloud-native workloads with configurable task priorities and time slices."
 LABEL org.opencontainers.image.documentation="https://github.com/gthulhu/gthulhu"
 LABEL org.opencontainers.image.source="https://github.com/schedkit/plumbing/tree/main/gthulhu"
 LABEL org.opencontainers.image.version="${SCX_VERSION}"
