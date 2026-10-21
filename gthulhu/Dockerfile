@@ -1,4 +1,5 @@
-FROM ghcr.io/gthulhu/gthulhu:latest AS builder
+ARG SCX_VERSION
+FROM ghcr.io/gthulhu/gthulhu:${SCX_VERSION} AS builder
 FROM alpine:3.22.2
 ARG SCX_VERSION
 COPY --from=builder /gthulhu/main /main
