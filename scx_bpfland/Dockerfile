@@ -1,5 +1,5 @@
 ARG BUILDARCH
-FROM rust:1.91-slim-bookworm AS builder
+FROM rust:1.91-slim-trixie AS builder
 ARG SCX_VERSION
 
 ADD https://github.com/sched-ext/scx.git#${SCX_VERSION} /scx
@@ -19,7 +19,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg2 \
     lsb-release \
     wget \
-    software-properties-common \
     && curl -fsSL https://apt.llvm.org/llvm.sh | bash -s -- 20 \
     && rm -rf /var/lib/apt/lists/*
 
