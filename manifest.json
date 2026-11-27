@@ -29,9 +29,6 @@
   "scx_pandemonium": {
     "imageURI": "ghcr.io/schedkit/scx_pandemonium"
   },
-  "scx_rustland": {
-    "imageURI": "ghcr.io/schedkit/scx_rustland"
-  },
   "scx_rusty": {
     "imageURI": "ghcr.io/schedkit/scx_rusty"
   },
